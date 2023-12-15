@@ -1,0 +1,20 @@
+# 阶段1：构建阶段
+FROM openjdk:11-jdk AS builder
+
+WORKDIR /app
+COPY ./demo-1.0.0.jar ./app.jar
+# 添加任何构建步骤
+
+# 阶段2：运行时阶段
+FROM openjdk:11-jre
+
+ENV TZ="Asia/Shanghai" GC_MAX_METASPACE_SIZE=600
+
+COPY --from=builder /app/app.jar /app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
+
+#构建容器后调用，也就是在容器启动时才进行调用  相当于我们给容器启动过程增加参数，--spring.profiles.active=test
+#CMD ["--spring.profiles.active=test"]
